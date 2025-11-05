@@ -8,7 +8,6 @@ import {
   Grid,
   Chip,
   LinearProgress,
-  Paper,
   List,
   ListItem,
   ListItemText,

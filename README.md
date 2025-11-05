@@ -118,7 +118,29 @@ When a Fascist policy is enacted, certain executive actions become available:
 - Node.js 14+
 - npm or yarn
 
-### Backend Setup
+### Quick Start (Recommended)
+
+**Windows:**
+- Double-click `start.bat` or run `start.ps1` in PowerShell
+- This will automatically install dependencies and start both servers
+
+**Linux/Mac:**
+- Run `chmod +x start.sh` to make it executable
+- Run `./start.sh`
+- This will automatically install dependencies and start both servers
+
+**Using npm (All Platforms):**
+```bash
+# Install all dependencies (backend and frontend)
+npm run install-all
+
+# Start both servers concurrently
+npm start
+```
+
+### Manual Setup
+
+#### Backend Setup
 
 1. Navigate to the backend directory:
 ```bash
@@ -137,7 +159,7 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 The backend will be available at `http://localhost:8000`
 
-### Frontend Setup
+#### Frontend Setup
 
 1. Navigate to the frontend directory:
 ```bash

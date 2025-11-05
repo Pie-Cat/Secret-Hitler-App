@@ -16,7 +16,7 @@ import PlayerMenu from './components/PlayerMenu';
 import Voting from './components/Voting';
 import RoleCard from './components/RoleCard';
 import wsService from './services/websocket';
-import { Phase, isGameOver, getFascistPlayers } from './utils/gameState';
+import { Phase, getFascistPlayers } from './utils/gameState';
 
 const HomePage = () => {
   const navigate = useNavigate();
