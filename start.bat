@@ -10,16 +10,27 @@ echo    Secret Hitler App Startup
 echo ========================================
 echo.
 
-REM Check if Python is installed
-echo Checking Python installation...
-python --version >nul 2>&1
+REM Check if Java is installed
+echo Checking Java installation...
+java -version >nul 2>&1
 if errorlevel 1 (
-    echo [ERROR] Python is not installed or not in PATH
-    echo Please install Python 3.8+ from https://www.python.org/
+    echo [ERROR] Java is not installed or not in PATH
+    echo Please install Java 17+ from https://adoptium.net/
     pause
     exit /b 1
 )
-python --version
+java -version
+
+REM Check if Maven is installed
+echo Checking Maven installation...
+mvn --version >nul 2>&1
+if errorlevel 1 (
+    echo [ERROR] Maven is not installed or not in PATH
+    echo Please install Maven from https://maven.apache.org/
+    pause
+    exit /b 1
+)
+mvn --version
 
 REM Check if Node.js is installed
 echo Checking Node.js installation...
@@ -35,23 +46,18 @@ node --version
 echo.
 echo Setting up backend...
 
-REM Check if backend dependencies are installed
-python -c "import fastapi" >nul 2>&1
+REM Build Java backend
+echo Building Java backend...
+cd backend-java
+call mvn clean package -DskipTests
 if errorlevel 1 (
-    echo Installing backend dependencies...
-    cd backend
-    pip install -r requirements.txt
-    if errorlevel 1 (
-        echo [ERROR] Failed to install backend dependencies
-        cd ..
-        pause
-        exit /b 1
-    )
+    echo [ERROR] Failed to build Java backend
     cd ..
-    echo Backend dependencies installed successfully
-) else (
-    echo Backend dependencies already installed
+    pause
+    exit /b 1
 )
+cd ..
+echo Backend built successfully
 
 echo Setting up frontend...
 
@@ -78,7 +84,7 @@ echo.
 
 REM Start backend in a new window
 echo Starting backend server on http://localhost:8000
-start "Secret Hitler Backend" cmd /k "cd /d %~dp0backend && python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000"
+start "Secret Hitler Backend" cmd /k "cd /d %~dp0backend-java && java -jar target\secret-hitler-backend-1.0.0.jar"
 
 REM Wait a moment for backend to start
 timeout /t 2 /nobreak >nul

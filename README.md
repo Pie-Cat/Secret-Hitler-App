@@ -26,8 +26,9 @@ python start.py
 ```
 
 These scripts will:
-- ✅ Check for required dependencies (Python and Node.js)
-- ✅ Automatically install backend and frontend dependencies if needed
+- ✅ Check for required dependencies (Java 17+, Maven, and Node.js)
+- ✅ Automatically build the Java backend
+- ✅ Install frontend dependencies if needed
 - ✅ Start both the backend and frontend servers
 - ✅ Open the application in your browser
 
@@ -157,25 +158,26 @@ When a Fascist policy is enacted, certain executive actions become available:
 > **Note:** If you used the startup scripts above, you can skip this section. The scripts handle all setup automatically.
 
 ### Prerequisites
-- Python 3.8+
-- Node.js 14+
-- npm or yarn
+- Java 17 or higher ([Download from Adoptium](https://adoptium.net/))
+- Maven 3.6+ ([Download from Apache](https://maven.apache.org/))
+- Node.js 14+ ([Download from Node.js](https://nodejs.org/))
+- npm (comes with Node.js)
 
-### Backend Setup
+### Backend Setup (Java/Spring Boot)
 
-1. Navigate to the backend directory:
+1. Navigate to the backend-java directory:
 ```bash
-cd backend
+cd backend-java
 ```
 
-2. Install Python dependencies:
+2. Build the project using Maven:
 ```bash
-pip install -r requirements.txt
+mvn clean package
 ```
 
-3. Run the FastAPI server:
+3. Run the Spring Boot server:
 ```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+java -jar target/secret-hitler-backend-1.0.0.jar
 ```
 
 The backend will be available at `http://localhost:8000`
@@ -218,12 +220,44 @@ Players can join the game from their phones by:
 2. Opening the application URL in their mobile browser
 3. Using the same game code to join the game
 
+## New Features
+
+### 🤖 Bot Support
+- **Test Game Mode**: Create games with AI bots (5-10 bots) for testing and practice
+- **Smart Bot AI**: Bots make strategic decisions based on their roles
+- **Automatic Bot Actions**: Bots participate in all game phases automatically
+
+### 👤 Player Customization
+- **Custom Usernames**: Set a display name different from your login name
+- **Profile Pictures**: Upload and use custom profile pictures
+- **Emotes**: Select and use emotes during gameplay
+
+### 💬 Chat System
+- **Real-time Chat**: Communicate with other players during the game
+- **System Messages**: Automatic game event notifications (e.g., "Fascists gain another one")
+- **Chat History**: View recent chat messages
+
+### 🎮 Game Flow Improvements
+- **Ready System**: All players (including bots) must mark ready between phases
+- **Random President**: Initial president is randomly selected
+- **Circular Board Layout**: Players displayed in a circle around the game board
+- **Optional Rules**: Host can enable/disable optional rules (e.g., show role on death)
+
+### 🎨 Customization
+- **Custom Images**: Host can upload custom card and board images
+- **Host Settings**: Game creator has access to special settings panel
+
+### 📱 Mobile Improvements
+- **QR Code Fix**: QR codes now use network IP for proper mobile device access
+- **Network Detection**: Automatic detection of server's network IP address
+
 ## Technical Details
 
-- **Backend**: FastAPI with WebSocket support for real-time communication
+- **Backend**: Spring Boot (Java) with WebSocket support for real-time communication
 - **Frontend**: React with Material-UI for responsive design
 - **Storage**: In-memory game state (games reset when server restarts)
 - **Communication**: WebSocket protocol for real-time game updates
+- **Build Tool**: Maven for Java backend dependency management
 
 ## License
 

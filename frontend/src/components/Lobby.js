@@ -18,17 +18,35 @@ import {
 import { ContentCopy } from '@mui/icons-material';
 import { QRCodeSVG } from 'qrcode.react';
 import wsService from '../services/websocket';
+import HostSettings from './HostSettings';
 
-const Lobby = ({ gameId, playerName, onGameStart }) => {
+const Lobby = ({ gameId, playerName, onGameStart, gameState }) => {
   const [players, setPlayers] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // Generate join URL
-  const joinUrl = useMemo(() => {
-    const baseUrl = window.location.origin;
-    return `${baseUrl}/join/${gameId}`;
+  const [serverInfo, setServerInfo] = useState({ host: 'localhost', port: 8000 });
+  const [joinUrl, setJoinUrl] = useState('');
+
+  // Fetch server info and generate join URL
+  useEffect(() => {
+    const apiHost = process.env.REACT_APP_API_HOST || 'http://localhost:8000';
+    fetch(`${apiHost}/api/server-info`)
+      .then(res => res.json())
+      .then(data => {
+        setServerInfo(data);
+        const protocol = window.location.protocol;
+        const host = data.host || 'localhost';
+        const port = data.port || 8000;
+        const baseUrl = `${protocol}//${host}:${port === 80 || port === 443 ? '' : port}`;
+        setJoinUrl(`${baseUrl}/join/${gameId}`);
+      })
+      .catch(err => {
+        console.error('Failed to fetch server info:', err);
+        const baseUrl = window.location.origin;
+        setJoinUrl(`${baseUrl}/join/${gameId}`);
+      });
   }, [gameId]);
 
   // Copy URL to clipboard
@@ -157,12 +175,14 @@ const Lobby = ({ gameId, playerName, onGameStart }) => {
                 borderRadius: 2,
                 display: 'inline-block'
               }}>
-                <QRCodeSVG 
-                  value={joinUrl}
-                  size={200}
-                  level="H"
-                  includeMargin={true}
-                />
+                {joinUrl && (
+                  <QRCodeSVG 
+                    value={joinUrl}
+                    size={200}
+                    level="H"
+                    includeMargin={true}
+                  />
+                )}
               </Box>
               <Box sx={{ width: '100%' }}>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
@@ -202,6 +222,36 @@ const Lobby = ({ gameId, playerName, onGameStart }) => {
               </Box>
             </Box>
           </Paper>
+
+          {/* Host Settings */}
+          {gameState && gameState.host_name === playerName && (
+            <HostSettings
+              gameId={gameId}
+              isHost={true}
+              gameState={gameState}
+              onRulesUpdate={(rules) => {
+                // Update rules via WebSocket
+                wsService.send('update_rules', rules);
+              }}
+              onTestGame={(numBots) => {
+                const apiHost = process.env.REACT_APP_API_HOST || 'http://localhost:8000';
+                fetch(`${apiHost}/api/create-test-game`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ num_bots: numBots, host_name: playerName })
+                })
+                  .then(res => res.json())
+                  .then(data => {
+                    if (data.game_id) {
+                      window.location.href = `/game/${data.game_id}/${encodeURIComponent(playerName)}`;
+                    }
+                  })
+                  .catch(err => {
+                    setError('Failed to create test game: ' + err.message);
+                  });
+              }}
+            />
+          )}
 
           <Box sx={{ mt: 3, mb: 2 }}>
             <Typography variant="h6" gutterBottom>

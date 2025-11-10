@@ -8,7 +8,8 @@ import {
   Typography,
   Card,
   CardContent,
-  Alert
+  Alert,
+  Grid
 } from '@mui/material';
 import Lobby from './components/Lobby';
 import GameBoard from './components/GameBoard';
@@ -219,6 +220,7 @@ const GamePage = () => {
       <Lobby
         gameId={gameId}
         playerName={decodedPlayerName}
+        gameState={gameState}
         onGameStart={(payload) => {
           setGameState(payload);
           setRoleRevealed(true);
@@ -260,7 +262,11 @@ const GamePage = () => {
         </Alert>
       )}
 
-      <GameBoard gameState={gameState} playerName={decodedPlayerName} />
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={8}>
+          <GameBoard gameState={gameState} playerName={decodedPlayerName} />
+        </Grid>
+      </Grid>
 
       {/* Voting Phase */}
       {gameState.current_phase === Phase.VOTING && (

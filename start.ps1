@@ -10,16 +10,28 @@ Write-Host "   Secret Hitler App Startup" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Check if Python is installed
-Write-Host "Checking Python installation..." -ForegroundColor Yellow
-$pythonCheck = & python --version 2>&1
+# Check if Java is installed
+Write-Host "Checking Java installation..." -ForegroundColor Yellow
+$javaCheck = & java -version 2>&1
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "Error: Python is not installed or not in PATH" -ForegroundColor Red
-    Write-Host "Please install Python 3.8+ from https://www.python.org/" -ForegroundColor Red
+    Write-Host "Error: Java is not installed or not in PATH" -ForegroundColor Red
+    Write-Host "Please install Java 17+ from https://adoptium.net/" -ForegroundColor Red
     Read-Host "Press Enter to exit"
     exit 1
 } else {
-    Write-Host "Found: $pythonCheck" -ForegroundColor Green
+    Write-Host "Found Java" -ForegroundColor Green
+}
+
+# Check if Maven is installed
+Write-Host "Checking Maven installation..." -ForegroundColor Yellow
+$mavenCheck = & mvn --version 2>&1
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Error: Maven is not installed or not in PATH" -ForegroundColor Red
+    Write-Host "Please install Maven from https://maven.apache.org/" -ForegroundColor Red
+    Read-Host "Press Enter to exit"
+    exit 1
+} else {
+    Write-Host "Found Maven" -ForegroundColor Green
 }
 
 # Check if Node.js is installed
@@ -37,23 +49,18 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host ""
 Write-Host "Setting up backend..." -ForegroundColor Yellow
 
-# Check if backend dependencies are installed
-$fastapiInstalled = & python -c "import fastapi" 2>&1
+# Build Java backend
+Write-Host "Building Java backend..." -ForegroundColor Yellow
+Push-Location "backend-java"
+& mvn clean package -DskipTests
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "Installing backend dependencies..." -ForegroundColor Yellow
-    Push-Location "backend"
-    & pip install -r requirements.txt
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "Error: Failed to install backend dependencies" -ForegroundColor Red
-        Pop-Location
-        Read-Host "Press Enter to exit"
-        exit 1
-    }
+    Write-Host "Error: Failed to build Java backend" -ForegroundColor Red
     Pop-Location
-    Write-Host "Backend dependencies installed successfully" -ForegroundColor Green
-} else {
-    Write-Host "Backend dependencies already installed" -ForegroundColor Green
+    Read-Host "Press Enter to exit"
+    exit 1
 }
+Pop-Location
+Write-Host "Backend built successfully" -ForegroundColor Green
 
 Write-Host "Setting up frontend..." -ForegroundColor Yellow
 
@@ -79,12 +86,13 @@ Write-Host "Starting servers..." -ForegroundColor Green
 Write-Host ""
 
 # Get absolute paths
-$backendPath = Join-Path $scriptPath "backend"
+$backendJavaPath = Join-Path $scriptPath "backend-java"
 $frontendPath = Join-Path $scriptPath "frontend"
 
 # Start backend in a new window
 Write-Host "Starting backend server on http://localhost:8000" -ForegroundColor Cyan
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$backendPath'; python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000"
+$backendJarPath = Join-Path $backendJavaPath "target\secret-hitler-backend-1.0.0.jar"
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$backendJavaPath'; java -jar '$backendJarPath'"
 
 # Wait a moment for backend to start
 Start-Sleep -Seconds 2

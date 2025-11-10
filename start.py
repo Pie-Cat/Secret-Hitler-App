@@ -55,11 +55,11 @@ def main():
     
     # Check prerequisites
     print("Checking prerequisites...")
-    if not check_command("python", "Python", "https://www.python.org/"):
+    if not check_command("java", "Java", "https://adoptium.net/"):
         sys.exit(1)
     
-    # Try python3 if python doesn't work
-    python_cmd = "python3" if platform.system() != "Windows" and shutil.which("python3") else "python"
+    if not check_command("mvn", "Maven", "https://maven.apache.org/"):
+        sys.exit(1)
     
     if not check_command("node", "Node.js", "https://nodejs.org/"):
         sys.exit(1)
@@ -70,15 +70,12 @@ def main():
     print()
     print("Setting up backend...")
     
-    # Check if backend dependencies are installed
-    try:
-        import fastapi
-        print("✅ Backend dependencies already installed")
-    except ImportError:
-        print("Installing backend dependencies...")
-        if not run_command([python_cmd, "-m", "pip", "install", "-r", "requirements.txt"], 
-                          cwd=backend_dir):
-            sys.exit(1)
+    # Build Java backend
+    backend_java_dir = project_root / "backend-java"
+    print("Building Java backend...")
+    if not run_command(["mvn", "clean", "package", "-DskipTests"], cwd=backend_java_dir):
+        sys.exit(1)
+    print("✅ Backend built successfully")
     
     print()
     print("Setting up frontend...")
@@ -100,16 +97,16 @@ def main():
     
     # Start backend
     print("🚀 Starting backend server on http://localhost:8000")
-    backend_cmd = [python_cmd, "-m", "uvicorn", "main:app", 
-                   "--reload", "--host", "0.0.0.0", "--port", "8000"]
+    backend_jar = backend_java_dir / "target" / "secret-hitler-backend-1.0.0.jar"
+    backend_cmd = ["java", "-jar", str(backend_jar)]
     
     if is_windows:
         # On Windows, start in a new window
-        subprocess.Popen(backend_cmd, cwd=backend_dir, 
+        subprocess.Popen(backend_cmd, cwd=backend_java_dir,
                         creationflags=subprocess.CREATE_NEW_CONSOLE)
     else:
         # On Unix-like systems, start in background
-        subprocess.Popen(backend_cmd, cwd=backend_dir,
+        subprocess.Popen(backend_cmd, cwd=backend_java_dir,
                         stdout=subprocess.DEVNULL, 
                         stderr=subprocess.DEVNULL)
     
