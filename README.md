@@ -2,6 +2,47 @@
 
 An online implementation of the Secret Hitler board game, allowing players to join from their phones and play together in real-time.
 
+## Quick Start
+
+> 💡 **New to the project?** See [QUICKSTART.md](QUICKSTART.md) for a detailed step-by-step guide.
+
+### 🚀 Simple Run (Recommended)
+
+The easiest way to run the application is using one of the provided startup scripts:
+
+#### Windows (PowerShell)
+```powershell
+.\start.ps1
+```
+
+#### Windows (Command Prompt)
+```batch
+start.bat
+```
+
+#### Cross-Platform (Python)
+```bash
+python start.py
+```
+
+These scripts will:
+- ✅ Check for required dependencies (Python and Node.js)
+- ✅ Automatically install backend and frontend dependencies if needed
+- ✅ Start both the backend and frontend servers
+- ✅ Open the application in your browser
+
+**That's it!** The application will be available at:
+- Frontend: http://localhost:3000
+- Backend: http://localhost:8000
+
+---
+
+### Manual Setup (Alternative)
+
+If you prefer to set up manually, see the [Setup Instructions](#setup-instructions) section below.
+
+---
+
 ## Game Rules
 
 ### Overview
@@ -113,34 +154,14 @@ When a Fascist policy is enacted, certain executive actions become available:
 
 ## Setup Instructions
 
+> **Note:** If you used the startup scripts above, you can skip this section. The scripts handle all setup automatically.
+
 ### Prerequisites
 - Python 3.8+
 - Node.js 14+
 - npm or yarn
 
-### Quick Start (Recommended)
-
-**Windows:**
-- Double-click `start.bat` or run `start.ps1` in PowerShell
-- This will automatically install dependencies and start both servers
-
-**Linux/Mac:**
-- Run `chmod +x start.sh` to make it executable
-- Run `./start.sh`
-- This will automatically install dependencies and start both servers
-
-**Using npm (All Platforms):**
-```bash
-# Install all dependencies (backend and frontend)
-npm run install-all
-
-# Start both servers concurrently
-npm start
-```
-
-### Manual Setup
-
-#### Backend Setup
+### Backend Setup
 
 1. Navigate to the backend directory:
 ```bash
@@ -159,7 +180,7 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 The backend will be available at `http://localhost:8000`
 
-#### Frontend Setup
+### Frontend Setup
 
 1. Navigate to the frontend directory:
 ```bash
@@ -177,6 +198,8 @@ npm start
 ```
 
 The frontend will be available at `http://localhost:3000`
+
+> **Important:** Both servers must be running simultaneously for the application to work.
 
 ### Playing the Game
 
